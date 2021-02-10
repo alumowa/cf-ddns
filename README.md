@@ -17,5 +17,5 @@ It's best to run the script periodically using `cron`.
 
 ## Dependencies
 
-The only dependency requires is [dotenv](https://github.com/motdotla/dotenv) to handle the `.env`
+The only dependency required is [dotenv](https://github.com/motdotla/dotenv) to handle the `.env`
 file loading/parsing.
