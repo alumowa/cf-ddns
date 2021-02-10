@@ -5,9 +5,17 @@
 const { Resolver } = require('dns').promises;
 const Https = require('https');
 const Path = require('path');
+const Assert = require('assert');
 
 //Load ENV
 require('dotenv').config();
+
+//Ensure we have required params
+const { CF_APIKEY, CF_EMAIL, CF_ZONEID, CF_RECORDID } = process.env;
+Assert(CF_APIKEY, 'Cloudflare API key value required');
+Assert(CF_EMAIL, 'Cloudflare email value required');
+Assert(CF_ZONEID, 'Cloudflare Zone ID value required');
+Assert(CF_RECORDID, 'Cloudflare record ID value required');
 
 /**
  * Utilize DNS to find public facing ip. Lightweight
@@ -47,11 +55,11 @@ const Service = {
 
   const options = {
     hostname: 'api.cloudflare.com',
-    path: Path.join('/client/v4/zones/', process.env.CF_ZONEID, '/dns_records/', process.env.CF_RECORDID).normalize(),
+    path: Path.join('/client/v4/zones', CF_ZONEID, 'dns_records', CF_RECORDID).normalize(),
     method: 'PATCH',
     headers: {
-      'X-Auth-Key': process.env.CF_APIKEY,
-      'X-Auth-Email': process.env.CF_EMAIL,
+      'X-Auth-Key': CF_APIKEY,
+      'X-Auth-Email': CF_EMAIL,
       'Content-Type': 'application/JSON',
       'Content-Length': payload.length
     }
@@ -70,7 +78,7 @@ const Service = {
         console.error(`BODY: ${chunk}`);
       });
     }else{
-      console.info(`CF record ${process.env.CF_RECORDID} updated to ${pubIpV4}`);
+      console.info(`CF record ${CF_RECORDID} updated to ${pubIpV4}`);
     }
 
   });
