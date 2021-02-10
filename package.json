@@ -1,0 +1,14 @@
+{
+  "name": "cf-ddns",
+  "version": "1.0.0",
+  "description": "Script to update DDNS record (cloudflare)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Alvin Lumowa",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^8.2.0"
+  }
+}
