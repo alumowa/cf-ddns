@@ -5,15 +5,20 @@
 const { Resolver } = require('dns').promises;
 const Https = require('https');
 const Path = require('path');
-const Assert = require('assert');
+const Assert = require('assert').strict;
 
 //Load ENV
 require('dotenv').config();
 
 //Ensure we have required params
-const { CF_APIKEY, CF_EMAIL, CF_ZONEID, CF_RECORDID } = process.env;
-Assert(CF_APIKEY, 'Cloudflare API key value required');
-Assert(CF_EMAIL, 'Cloudflare email value required');
+const { CF_APITOKEN, CF_APIKEY, CF_EMAIL, CF_ZONEID, CF_RECORDID } = process.env;
+
+if(CF_APITOKEN) {
+  Assert(CF_APITOKEN, 'Cloudflare API key value required');
+}else {
+  Assert(CF_APIKEY, 'Cloudflare API key value required');
+  Assert(CF_EMAIL, 'Cloudflare email value required');
+}
 Assert(CF_ZONEID, 'Cloudflare Zone ID value required');
 Assert(CF_RECORDID, 'Cloudflare record ID value required');
 
@@ -58,12 +63,18 @@ const Service = {
     path: Path.join('/client/v4/zones', CF_ZONEID, 'dns_records', CF_RECORDID).normalize(),
     method: 'PATCH',
     headers: {
-      'X-Auth-Key': CF_APIKEY,
-      'X-Auth-Email': CF_EMAIL,
       'Content-Type': 'application/JSON',
       'Content-Length': payload.length
     }
   };
+
+  //Attach auth credentials to req header (token OR apikey + email)
+  if(!!CF_APITOKEN && CF_APITOKEN.length){
+    options.headers['Authorization'] = `Bearer ${CF_APITOKEN}`;
+  }else{
+    options.headers['X-Auth-Key'] = CF_APIKEY;
+    options.headers['X-Auth-Email'] = CF_EMAIL;
+  }
 
   const req = Https.request(options, (res) => {
 
